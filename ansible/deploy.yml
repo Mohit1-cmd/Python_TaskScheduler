@@ -14,12 +14,18 @@
         name: task-cli
         state: absent
 
+    - name: Create custom docker network
+      community.docker.docker_network:
+        name: task-network
+
     - name: Ensure MySQL container is running
       community.docker.docker_container:
         name: task-db
         image: mysql:8.0
         state: started
         restart_policy: unless-stopped
+        networks:
+          - name: task-network
         env:
           MYSQL_ROOT_PASSWORD: "root"
           MYSQL_DATABASE: "taskdb"
@@ -33,6 +39,8 @@
         image: mohit67/task-automation-cli:latest
         state: started
         restart_policy: unless-stopped
+        networks:
+          - name: task-network
         env:
           DB_HOST: "task-db"
           DB_USER: "root"
