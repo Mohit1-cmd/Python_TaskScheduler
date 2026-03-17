@@ -24,7 +24,7 @@
           MYSQL_ROOT_PASSWORD: "root"
           MYSQL_DATABASE: "taskdb"
         ports:
-          - "3306:3306"
+          - "3307:3306"
         detach: true
 
     - name: Start app container
