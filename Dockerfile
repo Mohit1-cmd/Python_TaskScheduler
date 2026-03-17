@@ -11,5 +11,5 @@ FROM base AS app
 
 COPY . .
 
-# Default: show help; override with docker run ... python cli.py <cmd>
-CMD ["python", "cli.py", "--help"]
+# Default: Keep container alive so users can 'docker exec' into it and run commands
+CMD ["tail", "-f", "/dev/null"]

@@ -37,7 +37,7 @@ services:
       - .:/app          # mount source for live editing during dev
     stdin_open: true    # keep STDIN open (-i)
     tty: true           # allocate pseudo-TTY (-t)
-    command: ["python", "cli.py", "list"]
+    command: ["tail", "-f", "/dev/null"]
 
 volumes:
   mysql_data:
