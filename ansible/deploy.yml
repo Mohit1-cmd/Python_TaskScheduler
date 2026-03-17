@@ -29,9 +29,17 @@
         env:
           MYSQL_ROOT_PASSWORD: "root"
           MYSQL_DATABASE: "taskdb"
+        volumes:
+          - "{{ playbook_dir }}/../init_db.sql:/init_db.sql:ro"
         ports:
           - "3307:3306"
         detach: true
+
+    - name: Initialize Database Schema
+      community.docker.docker_container_exec:
+        container: task-db
+        command: /bin/bash -c "mysql -uroot -proot taskdb < /init_db.sql"
+      ignore_errors: yes # in case tables already exist
 
     - name: Start app container
       community.docker.docker_container:
