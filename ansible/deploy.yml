@@ -18,6 +18,11 @@
       community.docker.docker_network:
         name: task-network
 
+    - name: Stop and remove existing db container (to clear volume for init_db)
+      community.docker.docker_container:
+        name: task-db
+        state: absent
+
     - name: Ensure MySQL container is running
       community.docker.docker_container:
         name: task-db
