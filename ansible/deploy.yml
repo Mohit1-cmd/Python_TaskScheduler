@@ -1,0 +1,43 @@
+---
+- name: Deploy Task Automation CLI
+  hosts: webserver
+
+  tasks:
+
+    - name: Pull latest app image from Docker Hub
+      community.docker.docker_image:
+        name: mohit67/task-automation-cli:latest
+        source: pull
+
+    - name: Stop and remove existing app container (if any)
+      community.docker.docker_container:
+        name: task-cli
+        state: absent
+
+    - name: Ensure MySQL container is running
+      community.docker.docker_container:
+        name: task-db
+        image: mysql:8.0
+        state: started
+        restart_policy: unless-stopped
+        env:
+          MYSQL_ROOT_PASSWORD: "root"
+          MYSQL_DATABASE: "taskdb"
+        ports:
+          - "3306:3306"
+        detach: true
+
+    - name: Start app container
+      community.docker.docker_container:
+        name: task-cli
+        image: mohit67/task-automation-cli:latest
+        state: started
+        restart_policy: unless-stopped
+        env:
+          DB_HOST: "task-db"
+          DB_USER: "root"
+          DB_PASSWORD: "root"
+          DB_NAME: "taskdb"
+        interactive: true
+        tty: true
+        detach: true

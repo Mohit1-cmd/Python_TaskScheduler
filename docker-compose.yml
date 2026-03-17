@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+
+  # ── MySQL Database ──────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: task-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: taskdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── CLI App ─────────────────────────────────────────────────
+  app:
+    build: .
+    container_name: task-cli
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: taskdb
+    volumes:
+      - .:/app          # mount source for live editing during dev
+    stdin_open: true    # keep STDIN open (-i)
+    tty: true           # allocate pseudo-TTY (-t)
+    command: ["python", "cli.py", "list"]
+
+volumes:
+  mysql_data:
